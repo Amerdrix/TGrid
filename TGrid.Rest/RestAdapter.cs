@@ -3,7 +3,7 @@ using Nancy.Hosting.Self;
 using System;
 using System.Linq;
 
-namespace TGrid.Rest
+namespace Amerdrix.TGrid.Rest
 {
     public class RestAdapter : NancyModule, IAdapter
     {

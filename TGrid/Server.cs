@@ -5,8 +5,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
+using Amerdrix.TGrid.Indexing;
 
-namespace TGrid
+namespace Amerdrix.TGrid
 {
     internal class Server
     {
@@ -19,11 +20,12 @@ namespace TGrid
 
     class AdapterLoader
     {
-        public void Load(){
+        public void Load()
+        {
 
-            var binding = new StorageEngine();
+            var binding = new StorageEngine(1);
 
-            foreach(var adapter in Scan().SelectMany(t => t.GetTypes())
+            foreach (var adapter in Scan().SelectMany(t => t.GetTypes())
                                         .Where(t => t.GetInterfaces().Any(i => i == typeof(IAdapter)))
                                         .Select(t => Activator.CreateInstance(t) as IAdapter))
             {
@@ -33,11 +35,12 @@ namespace TGrid
 
         private IEnumerable<Assembly> Scan()
         {
-            var path = System.IO.Path.GetFullPath( @"..\..\..\TGrid.Rest\bin\Debug\Amerdrix.TGrid.Rest.Dll");
+            var path = System.IO.Path.GetFullPath(@"..\..\..\TGrid.Rest\bin\Debug\Amerdrix.TGrid.Rest.Dll");
             yield return System.Reflection.Assembly.LoadFile(path);
         }
-
     }
+
+
 
     public class Tuple
     {
@@ -51,7 +54,7 @@ namespace TGrid
     public class MatchPattern
     {
         private class Any { }
-        
+
         public readonly static object MatchAny = new Any();
 
         internal IEnumerable<object> Pattern { get; private set; }
@@ -76,42 +79,142 @@ namespace TGrid
         Tuple Read(MatchPattern match);
 
         Tuple Take(MatchPattern match);
+    }
+
+    class TupleNode
+    {
+        public Tuple Tuple { get; set; }
+        public TupleNode NextNode { get; set; }
+    }
+
+    struct TupleLocation
+    {
+        public static readonly TupleLocation None = new TupleLocation() { TableOffset = -1, Depth = -1 };
+
+        public int TableOffset;
+        public int Depth;
+
+        public bool Present
+        {
+            get
+            {
+                return !this.Equals(None);
+            }
+        }
+
+        private bool Equals(TupleLocation other)
+        {
+            return this.TableOffset == other.TableOffset && this.Depth == other.Depth;
+        }
 
     }
 
-    class StorageEngine : IStorageEngine 
+
+    class StorageEngine : IStorageEngine
     {
-        private readonly IList<Tuple> _tuples = new List<Tuple>();
+
+        private readonly IList<ITupleIndex> _indices = new List<ITupleIndex>();
+
+        private readonly TupleNode[] _space;
+        readonly uint _size;
+
+        public StorageEngine(uint size)
+        {
+            _indices.Add(new ScanIndex());
+
+            _size = size;
+            _space = new TupleNode[size];
+        }
 
         public void Put(Tuple tuple)
         {
-            _tuples.Add(tuple);
+            var hash = tuple.GetHashCode();
+            var offset = (int)(((hash % _size) + _size) % _size);
+
+            var location = new TupleLocation() { TableOffset = offset };
+
+            
+            var node = _space[offset];
+            if (node == null)
+            {
+                var newNode = new TupleNode() { Tuple = tuple };
+                _space[offset] = newNode;
+            }
+            else
+            {
+             
+                while (node.Tuple != null && node.NextNode != null)
+                {
+                    location.Depth++;
+                    node = node.NextNode;
+                }
+
+                if (node.Tuple == null)
+                {
+                    node.Tuple = tuple;
+                }
+                else
+                {
+                    location.Depth ++;
+                    var newNode = new TupleNode() { Tuple = tuple };
+                    node.NextNode = newNode;
+                }
+            }
+
+            foreach (var index in _indices)
+                index.Add(tuple, location);
         }
 
         public Tuple Read(MatchPattern match)
         {
-            var pattern = match.Pattern.ToList();
-           return  _tuples.FirstOrDefault(t => Match(t, pattern));
-            
+            var bestIndex = SelectIndex(match);
+            var location = bestIndex.Find(match);
+
+            if (location.Present)
+            {
+
+                return GetNode(location).Tuple;
+            }
+
+            return null;
+        }
+
+        private TupleNode GetNode(TupleLocation location)
+        {
+            var node = _space[location.TableOffset];
+            for (var i = 0; i < location.Depth; i++)
+            {
+                node = node.NextNode;
+            }
+
+            return node;
+
+        }
+
+        private ITupleIndex SelectIndex(MatchPattern pattern)
+        {
+            return _indices.OrderByDescending(x => x.Rank(pattern)).First();
         }
 
         public Tuple Take(MatchPattern match)
         {
-            var tuple = Read(match);
-            if(tuple != null)
-                _tuples.Remove(tuple);
-            return tuple;
-        }
+            var bestIndex = SelectIndex(match);
+            var location = bestIndex.Find(match);
 
-        private bool Match(Tuple tuple, IList<object> match)
-        {
-            for (var i = 0; i < tuple.Content.Length; i ++){
-                if (match[i] == MatchPattern.MatchAny)
-                    continue;
-                if (!tuple.Content[i].Equals(match[i]))
-                    return false;
+            if (location.Present)
+            {
+                var node = GetNode(location);
+
+                var tuple = node.Tuple;
+                node.Tuple = null;
+
+                foreach (var index in _indices)
+                    index.Remove(tuple);
+
+                return tuple;
             }
-            return true;
+
+            return null;
         }
     }
 }
