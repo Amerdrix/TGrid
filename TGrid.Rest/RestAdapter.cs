@@ -1,7 +1,10 @@
-﻿using Nancy;
-using Nancy.Hosting.Self;
-using System;
+﻿using System;
 using System.Linq;
+using Amerdrix.TGrid.Plugins;
+using Amerdrix.TGrid.Storage;
+using Nancy;
+using Nancy.Hosting.Self;
+using Tuple = Amerdrix.TGrid.Storage.Tuple;
 
 namespace Amerdrix.TGrid.Rest
 {
@@ -11,33 +14,33 @@ namespace Amerdrix.TGrid.Rest
 
         public RestAdapter()
         {
-            Put["/"] = (_) =>
+            Put["/"] = _ =>
             {
                 var t = ParseTuple();
-                _binding.Put(t);
+                Binding.Put(t);
                 return t.Content;
             };
-            Post["/"] = (_) =>
+            Post["/"] = _ =>
             {
                 var t = ParseTuple();
-                _binding.Put(t);
+                Binding.Put(t);
                 return t.Content;
             };
 
-            Delete["/"] = (_) =>
+            Delete["/"] = _ =>
             {
-                var match = ParseMatch();
-                var tuple = _binding.Take(match);
+                var match = ParseMatchPattern();
+                var tuple = Binding.Take(match);
 
                 if (tuple == null)
                     return HttpStatusCode.NotFound;
                 return tuple.Content;
             };
 
-            Get["/"] = (_) =>
+            Get["/"] = _ =>
             {
-                var match = ParseMatch();
-                var tuple = _binding.Read(match);
+                var match = ParseMatchPattern();
+                var tuple = Binding.Read(match);
 
                 if (tuple == null)
                     return HttpStatusCode.NotFound;
@@ -45,7 +48,8 @@ namespace Amerdrix.TGrid.Rest
             };
         }
 
-        private static IStorageEngine _binding { get; set; }
+        private static IStorageEngine Binding { get; set; }
+
         public void Dispose()
         {
             if (_host != null)
@@ -54,17 +58,16 @@ namespace Amerdrix.TGrid.Rest
 
         public void Register(IStorageEngine binding)
         {
-            _binding = binding;
+            Binding = binding;
 
-            var config = new HostConfiguration();
-            config.UrlReservations.CreateAutomatically = true;
+            var config = new HostConfiguration {UrlReservations = {CreateAutomatically = true}};
 
             _host = new NancyHost(config, new Uri("http://localhost:1337"));
 
             _host.Start();
         }
 
-        private MatchPattern ParseMatch()
+        private MatchPattern ParseMatchPattern()
         {
             string[] q = Request.Query.T.Value.Split(',');
 

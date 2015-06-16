@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Amerdrix.TGrid.Storage;
 
 namespace Amerdrix.TGrid.Indexing
 {
-
-    class ScanIndex : ITupleIndex
+    internal class ScanIndex : ITupleIndex
     {
         private readonly Dictionary<Tuple, TupleLocation> _tuples = new Dictionary<Tuple, TupleLocation>();
 
@@ -24,7 +21,16 @@ namespace Amerdrix.TGrid.Indexing
         public TupleLocation Find(MatchPattern pattern)
         {
             var match = pattern.Pattern.ToList();
-            return _tuples.Where(x => Match(x.Key.Content, match)).Select(x => x.Value).DefaultIfEmpty(TupleLocation.None).First();
+            return
+                _tuples.Where(x => Match(x.Key.Content, match))
+                    .Select(x => x.Value)
+                    .DefaultIfEmpty(TupleLocation.None)
+                    .First();
+        }
+
+        public double Rank(MatchPattern pattern)
+        {
+            return 0;
         }
 
         private bool Match(object[] tupleContent, IList<object> match)
@@ -38,11 +44,5 @@ namespace Amerdrix.TGrid.Indexing
             }
             return true;
         }
-
-        public double Rank(MatchPattern pattern)
-        {
-            return 0;
-        }
     }
 }
-    
