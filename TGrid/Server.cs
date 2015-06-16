@@ -7,7 +7,8 @@ namespace Amerdrix.TGrid
     {
         private static void Main(string[] args)
         {
-            new AdapterLoader().Load();
+            var engine = new Storage.StorageEngine(100);
+            new AdapterLoader().Load(engine);
             Console.ReadLine();
         }
     }

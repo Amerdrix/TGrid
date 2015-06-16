@@ -6,6 +6,11 @@ namespace Amerdrix.TGrid
     {
         public static readonly object MatchAny = new Any();
 
+        public MatchPattern(params object[] pattern)
+        {
+            Pattern = pattern;
+        }
+
         public MatchPattern(IEnumerable<object> pattern)
         {
             Pattern = pattern;

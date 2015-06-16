@@ -9,15 +9,13 @@ namespace Amerdrix.TGrid.Plugins
 {
     internal class AdapterLoader
     {
-        public void Load()
+        public void Load(StorageEngine engine)
         {
-            var binding = new StorageEngine(1);
-
             foreach (var adapter in Scan().SelectMany(t => t.GetTypes())
                 .Where(t => t.GetInterfaces().Any(i => i == typeof (IAdapter)))
                 .Select(t => Activator.CreateInstance(t) as IAdapter))
             {
-                adapter.Register(binding);
+                adapter.Register(engine);
             }
         }
 
