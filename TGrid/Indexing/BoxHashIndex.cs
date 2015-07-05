@@ -6,7 +6,7 @@
 
     using Amerdrix.TGrid.Storage;
 
-    internal class HashIndex : ITupleIndex<ITuple>
+    internal class BoxHashIndex : ITupleIndex<ITuple>
     {
         private readonly Dictionary<object, TupleContainer<ITuple>> _lookup =
             new Dictionary<object, TupleContainer<ITuple>>();

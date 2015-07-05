@@ -7,7 +7,7 @@ namespace Amerdrix.TGrid.Storage
 
     internal class StorageNode : IStorageEngine
     {
-        private readonly HashIndex _hashIndex = new HashIndex();
+        private readonly BoxHashIndex _hashIndex = new BoxHashIndex();
 
         private readonly IList<ITupleIndex<ITuple>> _indices = new List<ITupleIndex<ITuple>>();
 
@@ -15,7 +15,7 @@ namespace Amerdrix.TGrid.Storage
         public StorageNode()
         {
             _indices.Add(this._hashIndex);
-            _indices.Add(new ScanIndex());
+            _indices.Add(new BoxScanIndex());
         }
 
         public void Put(ITuple tuple)

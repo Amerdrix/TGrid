@@ -41,12 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Indexing\HashIndex.cs" />
+    <Compile Include="Indexing\BoxHashIndex.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Plugins\AdapterLoader.cs" />
     <Compile Include="Plugins\IAdapter.cs" />
     <Compile Include="Indexing\IIndex.cs" />
-    <Compile Include="Indexing\ScanIndex.cs" />
+    <Compile Include="Indexing\BoxScanIndex.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Storage\StorageNode.cs" />
     <Compile Include="Storage\IStorageEngine.cs" />
