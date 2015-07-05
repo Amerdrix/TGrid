@@ -2,11 +2,12 @@
 
 namespace Amerdrix.TGrid.Indexing
 {
-    internal interface ITupleIndex
+    internal interface ITupleIndex<TTuple>
+        where TTuple: ITuple
     {
-        void Add(ITuple tuple, TupleLocation index);
-        void Remove(ITuple tuple);
+        void Add(TupleContainer<TTuple> container);
+        void Remove(TupleContainer<TTuple> tuple);
         double Rank(MatchPattern pattern);
-        TupleLocation Find(MatchPattern pattern);
+        TupleContainer<TTuple> Find(MatchPattern pattern);
     }
 }

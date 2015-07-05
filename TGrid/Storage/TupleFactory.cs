@@ -56,7 +56,7 @@ namespace Amerdrix.TGrid.Storage
 
             private Delegate CreateFactoryMethod()
             {
-                return (Func<IList<object>, object>)(items => new Tuple(items));
+                return (Func<IList<object>, object>)(items => new BoxTuple(items));
             }
         }
     }

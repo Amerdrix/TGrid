@@ -4,28 +4,26 @@ using Amerdrix.TGrid.Storage;
 
 namespace Amerdrix.TGrid.Indexing
 {
-    internal class ScanIndex : ITupleIndex
+    internal class ScanIndex : ITupleIndex<ITuple>
     {
-        private readonly Dictionary<ITuple, TupleLocation> tuples = new Dictionary<ITuple, TupleLocation>();
+        private readonly IList<TupleContainer<ITuple>> _tuples = new List<TupleContainer<ITuple>>();
+        
 
-        public void Add(ITuple tuple, TupleLocation index)
+        public void Add(TupleContainer<ITuple> container)
         {
-            this.tuples.Add(tuple, index);
+            this._tuples.Add(container);
         }
 
-        public void Remove(ITuple tuple)
+        public void Remove(TupleContainer<ITuple> tuple)
         {
-            this.tuples.Remove(tuple);
+            this._tuples.Remove(tuple);
         }
 
-        public TupleLocation Find(MatchPattern pattern)
+        public TupleContainer<ITuple> Find(MatchPattern pattern)
         {
             var match = pattern.Pattern.ToList();
-            return
-                this.tuples.Where(x => Match(x.Key.Content, match))
-                    .Select(x => x.Value)
-                    .DefaultIfEmpty(TupleLocation.None)
-                    .First();
+            return this._tuples
+                    .FirstOrDefault(x => Match(x.Tuple.Content, match));
         }
 
         public double Rank(MatchPattern pattern)

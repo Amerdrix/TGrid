@@ -10,7 +10,7 @@
     {
         private static void Main(string[] args)
         {
-            var engine = new StorageEngine(100);
+            var engine = new StorageNode();
             var factory = new TupleFactory();
             var logger = new Logger();
             new AdapterLoader().Load(engine, factory, logger);
