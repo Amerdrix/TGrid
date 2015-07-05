@@ -41,10 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Logging\Logger.cs" />
     <Compile Include="Plugins\AdapterLoader.cs" />
     <Compile Include="Plugins\IAdapter.cs" />
     <Compile Include="Indexing\IIndex.cs" />
     <Compile Include="Indexing\ScanIndex.cs" />
+    <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Storage\StorageEngine.cs" />
     <Compile Include="Storage\IStorageEngine.cs" />
     <Compile Include="MatchPattern.cs" />
@@ -53,6 +55,7 @@
     <Compile Include="Storage\Tuple.cs" />
     <Compile Include="Storage\TupleLocation.cs" />
     <Compile Include="Storage\TupleNode.cs" />
+    <Compile Include="Storage\TupleFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

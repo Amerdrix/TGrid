@@ -7,15 +7,18 @@ using Amerdrix.TGrid.Storage;
 
 namespace Amerdrix.TGrid.Plugins
 {
+    using Amerdrix.TGrid.Logging;
+
     internal class AdapterLoader
     {
-        public void Load(StorageEngine engine)
+        public void Load(IStorageEngine engine, ITupleFactory tupleFactory, ILogger logger)
         {
+
             foreach (var adapter in Scan().SelectMany(t => t.GetTypes())
                 .Where(t => t.GetInterfaces().Any(i => i == typeof (IAdapter)))
                 .Select(t => Activator.CreateInstance(t) as IAdapter))
             {
-                adapter.Register(engine);
+                adapter.Register(engine, tupleFactory, logger);
             }
         }
 

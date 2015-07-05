@@ -6,23 +6,23 @@ namespace Amerdrix.TGrid.Indexing
 {
     internal class ScanIndex : ITupleIndex
     {
-        private readonly Dictionary<Tuple, TupleLocation> _tuples = new Dictionary<Tuple, TupleLocation>();
+        private readonly Dictionary<ITuple, TupleLocation> tuples = new Dictionary<ITuple, TupleLocation>();
 
-        public void Add(Tuple tuple, TupleLocation index)
+        public void Add(ITuple tuple, TupleLocation index)
         {
-            _tuples.Add(tuple, index);
+            this.tuples.Add(tuple, index);
         }
 
-        public void Remove(Tuple tuple)
+        public void Remove(ITuple tuple)
         {
-            _tuples.Remove(tuple);
+            this.tuples.Remove(tuple);
         }
 
         public TupleLocation Find(MatchPattern pattern)
         {
             var match = pattern.Pattern.ToList();
             return
-                _tuples.Where(x => Match(x.Key.Content, match))
+                this.tuples.Where(x => Match(x.Key.Content, match))
                     .Select(x => x.Value)
                     .DefaultIfEmpty(TupleLocation.None)
                     .First();

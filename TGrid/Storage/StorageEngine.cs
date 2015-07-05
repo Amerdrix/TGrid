@@ -18,7 +18,7 @@ namespace Amerdrix.TGrid.Storage
             _space = new TupleNode[size];
         }
 
-        public void Put(Tuple tuple)
+        public void Put(ITuple tuple)
         {
             var hash = tuple.GetHashCode();
             var offset = (int) (((hash%_size) + _size)%_size);
@@ -56,7 +56,7 @@ namespace Amerdrix.TGrid.Storage
                 index.Add(tuple, location);
         }
 
-        public Tuple Read(MatchPattern match)
+        public ITuple Read(MatchPattern match)
         {
             var bestIndex = SelectIndex(match);
             var location = bestIndex.Find(match);
@@ -69,7 +69,7 @@ namespace Amerdrix.TGrid.Storage
             return null;
         }
 
-        public Tuple Take(MatchPattern match)
+        public ITuple Take(MatchPattern match)
         {
             var bestIndex = SelectIndex(match);
             var location = bestIndex.Find(match);

@@ -2,8 +2,8 @@
 {
     public interface IStorageEngine
     {
-        void Put(Tuple tuple);
-        Tuple Read(MatchPattern match);
-        Tuple Take(MatchPattern match);
+        void Put(ITuple tuple);
+        ITuple Read(MatchPattern match);
+        ITuple Take(MatchPattern match);
     }
 }

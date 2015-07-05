@@ -2,7 +2,7 @@
 {
     internal class TupleNode
     {
-        public Tuple Tuple { get; set; }
+        public ITuple Tuple { get; set; }
         public TupleNode NextNode { get; set; }
     }
 }
