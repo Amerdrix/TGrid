@@ -48,7 +48,8 @@
     <Compile Include="Indexing\IIndex.cs" />
     <Compile Include="Indexing\BoxScanIndex.cs" />
     <Compile Include="Logging\ILogger.cs" />
-    <Compile Include="Storage\StorageNode.cs" />
+    <Compile Include="Storage\StorageEngine.cs" />
+    <Compile Include="Storage\PaxosNode.cs" />
     <Compile Include="Storage\IStorageEngine.cs" />
     <Compile Include="MatchPattern.cs" />
     <Compile Include="Server.cs" />

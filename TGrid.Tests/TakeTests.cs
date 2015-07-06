@@ -9,7 +9,7 @@ namespace Amerdrix.TGrid.Tests
         [Test]
         public void PutOnceTakeOnceExact()
         {
-            var engine = new StorageNode();
+            var engine = new StorageEngine();
 
             engine.Put(new BoxTuple(1, 2));
 
@@ -25,7 +25,7 @@ namespace Amerdrix.TGrid.Tests
         [Test]
         public void PutOnceTakeOnceNonExact()
         {
-            var engine = new StorageNode();
+            var engine = new StorageEngine();
 
             engine.Put(new BoxTuple(1, 2));
 
@@ -41,7 +41,7 @@ namespace Amerdrix.TGrid.Tests
         [Test]
         public void PutOnceTakeTwiceExact()
         {
-            var engine = new StorageNode();
+            var engine = new StorageEngine();
 
             engine.Put(new BoxTuple(1, 2));
             engine.Take(new MatchPattern(1, 2));
@@ -54,7 +54,7 @@ namespace Amerdrix.TGrid.Tests
         [Test]
         public void PutOnceTakeTwiceNonExact()
         {
-            var engine = new StorageNode();
+            var engine = new StorageEngine();
 
             engine.Put(new BoxTuple(1, 2));
             engine.Take(new MatchPattern(MatchPattern.MatchAny, 2));

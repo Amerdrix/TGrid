@@ -13,7 +13,6 @@ namespace Amerdrix.TGrid.Plugins
     {
         public void Load(IStorageEngine engine, ITupleFactory tupleFactory, ILogger logger)
         {
-
             foreach (var adapter in Scan().SelectMany(t => t.GetTypes())
                 .Where(t => t.GetInterfaces().Any(i => i == typeof (IAdapter)))
                 .Select(t => Activator.CreateInstance(t) as IAdapter))

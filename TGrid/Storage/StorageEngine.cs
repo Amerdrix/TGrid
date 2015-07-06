@@ -1,27 +1,30 @@
+using System.Collections.Generic;
+using System.Linq;
+using Amerdrix.TGrid.Indexing;
+
 namespace Amerdrix.TGrid.Storage
 {
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using Amerdrix.TGrid.Indexing;
-
-    internal class StorageNode : IStorageEngine
+    internal class StorageEngine : IStorageEngine
     {
         private readonly BoxHashIndex _hashIndex = new BoxHashIndex();
-
         private readonly IList<ITupleIndex<ITuple>> _indices = new List<ITupleIndex<ITuple>>();
 
-        
-        public StorageNode()
+        public StorageEngine()
         {
             _indices.Add(this._hashIndex);
             _indices.Add(new BoxScanIndex());
         }
 
+
         public void Put(ITuple tuple)
         {
-            var container = _hashIndex.Find(tuple);
+            var container = GetOrCreateContainer(tuple);
+            container.DangouroslyIncrementWriteCount();
+        }
 
+        public TupleContainer<ITuple> GetOrCreateContainer(ITuple tuple)
+        {
+            var container = _hashIndex.Find(tuple);
             if (container == null)
             {
                 container = new TupleContainer<ITuple>(tuple);
@@ -31,20 +34,26 @@ namespace Amerdrix.TGrid.Storage
                 }
             }
 
-            container.WriteCount ++;
+            return container;
         }
 
         public ITuple Read(MatchPattern match)
         {
-            var bestIndex = SelectIndex(match);
-            var location = bestIndex.Find(match);
+            var container = GetContainer(match);
 
-            if (!IsContainerEmpty(location))
+            if (!IsContainerEmpty(container))
             {
-                return location.Tuple;
+                return container.Tuple;
             }
 
             return null;
+        }
+
+        public TupleContainer<ITuple> GetContainer(MatchPattern match)
+        {
+            var bestIndex = SelectIndex(match);
+            var container = bestIndex.Find(match);
+            return container;
         }
 
         public ITuple Take(MatchPattern match)
@@ -54,7 +63,7 @@ namespace Amerdrix.TGrid.Storage
 
             if (!IsContainerEmpty(container))
             {
-                container.RemoveCount ++;
+                container.DangouroslyIncrementRemoveCount();
 
                 if (!IsContainerEmpty(container))
                 {

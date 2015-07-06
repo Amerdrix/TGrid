@@ -9,15 +9,14 @@ namespace Amerdrix.TGrid.Tests
         [Test]
         public void PutOnce()
         {
-            var engine = new StorageNode();
+            var engine = new StorageEngine();
             Assert.DoesNotThrow(() => { engine.Put(new BoxTuple(1, 2)); });
         }
 
         [Test]
         public void PutTwice()
         {
-            var engine = new StorageNode();
-
+            var engine = new StorageEngine();
 
             Assert.DoesNotThrow(() =>
             {
